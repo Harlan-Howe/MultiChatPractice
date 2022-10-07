@@ -1,9 +1,36 @@
-import socket, threading, struct
-from SocketMessageIOFile import SocketMessageIO
+import socket,threading, struct
+from typing import Dict, List
+from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
+def broadcast_message_to_all(message:str):
+    global userDictLock, userDict, broadcast_manager
+    if broadcast_manager is None:
+        broadcast_manager = SocketMessageIO()
 
-def listen_to_connection(connection:socket, address:str = None)->None:
+    userDictLock.acquire()
+    for id in userDict:
+        broadcast_manager.send_message_to_socket(message, userDict[id]["connection"])
+    userDictLock.release()
+
+def send_user_list_to_all():
+    global userDictLock, userDict, broadcast_manager
+    if broadcast_manager is None:
+        broadcast_manager = SocketMessageIO()
+
+    userDictLock.acquire()
+    list_info = f"{len(userDict)}"
+    for id in userDict:
+        print(f"{id=}\t{userDict[id]}\t{userDict[id]['name']=}")
+        list_info += f"\t{userDict[id]['name']}"
+
+    print(f"{list_info=}")
+
+    for id in userDict:
+        broadcast_manager.send_message_to_socket(message=list_info, connection=userDict[id]["connection"],type=MessageType.USER_LIST)
+    userDictLock.release()
+
+def listen_to_connection(connection:socket, id: int, address:str = None)->None:
     """
     a loop intended for a Thread to monitor the given socket and handle any messages that come from it. In this case,
     it is assumed that the first message received will be the name of the connection, in the format of a packed length
@@ -17,24 +44,38 @@ def listen_to_connection(connection:socket, address:str = None)->None:
     while True:
         # print(f"Waiting for message from {name}")
         try:
-            message = manager.receive_message_from_socket(connection)
+            type, message = manager.receive_message_from_socket(connection)
         except ConnectionAbortedError:
-            print(f"It looks like {name} has disconnected.")
+            print(f"{name} disconnected.")
+            userDictLock.acquire()
+            del userDict[id]
+            userDictLock.release()
+            broadcast_message_to_all(f"{name} has left the conversation.")
+            send_user_list_to_all()
             return
 
         if name is None:
             name = message
             manager.send_message_to_socket(f"Welcome, {name}!", connection)
+            userDictLock.acquire()
+            userDict[id]["name"] = name
+            userDictLock.release()
+            broadcast_message_to_all(f"{name} has joined the conversation.")
+            send_user_list_to_all()
         else:
             manager.send_message_to_socket(f"Acknowledging: {message}", connection)
 
 
 
 if __name__ == '__main__':
-    global connectionThreadList, connectionThreadListLock
+    global userDict, userDictLock, latest_id, broadcast_manager
+    broadcast_manager = None
+    latest_id = 0
+
+    userDict: Dict[int, Dict] = {}
+    userDictLock = threading.Lock()
+
     mySocket = socket.socket()
-    connectionThreadList = []
-    connectionThreadListLock = threading.Lock()
     port = 3000
     mySocket.bind(('',port))
     mySocket.listen(5)
@@ -44,10 +85,15 @@ if __name__ == '__main__':
 
         print (f"Got connection from {address}")
         # connection.send("Thank you for connecting.".encode())
-        connectionThread = threading.Thread(target=listen_to_connection, args= (connection, address))
-        connectionThreadListLock.acquire()
-        connectionThreadList.append(connectionThread)
-        connectionThreadListLock.release()
+
+        latest_id += 1
+        connectionThread = threading.Thread(target=listen_to_connection, args=(connection, latest_id, address))
+
+        userDictLock.acquire()
+        userDict[latest_id] = {"name":"unknown", "connection":connection}
+        userDictLock.release()
+
+
         connectionThread.start()
 
 
