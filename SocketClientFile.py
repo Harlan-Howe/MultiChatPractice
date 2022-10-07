@@ -9,8 +9,11 @@ from tkinter import ttk
 
 def listen_for_messages(connection: socket):
 
-    while(True):
-        type, message = manager.receive_message_from_socket(connection)
+    while keep_listening:
+        try:
+            type, message = manager.receive_message_from_socket(connection)
+        except:
+            continue
         print(f"{type=}\t{message=}")
         if type == MessageType.MESSAGE:
             print(f"MSG: {message}")
@@ -23,6 +26,7 @@ def listen_for_messages(connection: socket):
             print("------------------")
             client_gui.set_user_list(user_list)
 
+    print("listen_for_messages is over.")
 
 def update_user_list(message: str)->None:
     global user_list
@@ -39,10 +43,16 @@ def update_user_list(message: str)->None:
 def send_message(message:str):
     manager.send_message_to_socket(message, mySocket)
 
+def close_socket():
+    global keep_listening
+    keep_listening = False
+    mySocket.close()
+
+
 if __name__ == '__main__':
 
 
-    global manager, user_list, client_gui, mySocket
+    global manager, user_list, client_gui, mySocket, listener_thread, keep_listening
     client_gui = ClientGUI()
     user_list = []
     mySocket = socket.socket()
@@ -56,10 +66,16 @@ if __name__ == '__main__':
     manager.send_message_to_socket(name, mySocket)
     # acknowledgement = manager.receive_message_from_socket(mySocket)
     # print(acknowledgement)
-
+    keep_listening = True
     listener_thread = threading.Thread(target=listen_for_messages, args=(mySocket,))
     listener_thread.start()
     client_gui.message_sender = send_message
+    client_gui.shut_down_socket = close_socket
     print("attempting to run")
+
     client_gui.run_loop()
+    print("main loop over?")
     listener_thread.join()
+    print("listener_thread joined.")
+    exit(0)
+

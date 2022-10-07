@@ -28,7 +28,14 @@ class ClientGUI:
         self.chat_response_label.grid(column=1, row=0)
 
     def run_loop(self):
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
+
+    def on_closing(self):
+        print("attempting to close.")
+        self.shut_down_socket()
+        print("Got here.")
+        self.root.destroy()
 
     def set_user_list(self, users: List[str])->None:
         names = ""
