@@ -63,7 +63,7 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
             broadcast_message_to_all(f"{name} has joined the conversation.")
             send_user_list_to_all()
         else:
-            manager.send_message_to_socket(f"{name}: {message}", connection)
+            broadcast_message_to_all(f"{name}: {message}")
 
 
 
