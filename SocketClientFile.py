@@ -69,13 +69,12 @@ if __name__ == '__main__':
     keep_listening = True
     listener_thread = threading.Thread(target=listen_for_messages, args=(mySocket,))
     listener_thread.start()
+
+    #telling the GUI about two methods in this class that it can call.
     client_gui.message_sender = send_message
     client_gui.shut_down_socket = close_socket
-    print("attempting to run")
+
 
     client_gui.run_loop()
-    print("main loop over?")
-    listener_thread.join()
-    print("listener_thread joined.")
-    exit(0)
+
 

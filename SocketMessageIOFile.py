@@ -22,6 +22,7 @@ class SocketMessageIO:
         :return: a string containing the content of the message that was sent.
         Throws a ConnectionAbortedError exception if this socket has been discontinued.
         """
+
         message_length_str = connection.recv(4)
         if message_length_str == b'':
             print("no data - disconnected?")

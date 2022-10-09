@@ -32,9 +32,7 @@ class ClientGUI:
         self.root.mainloop()
 
     def on_closing(self):
-        print("attempting to close.")
         self.shut_down_socket()
-        print("Got here.")
         self.root.destroy()
 
     def set_user_list(self, users: List[str])->None:
