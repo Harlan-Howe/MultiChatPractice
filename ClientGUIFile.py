@@ -8,7 +8,7 @@ class ClientGUI:
         self.root.title("Client")
         self.root.geometry('800x800+50+50')
         self.root.columnconfigure(0,weight=1)
-        self.root.columnconfigure(1,weight=4)
+        self.root.columnconfigure(1,weight=3)
         self.root.rowconfigure(0,weight=5)
         self.root.rowconfigure(1,weight=1)
 
@@ -18,10 +18,15 @@ class ClientGUI:
         self.text_field.grid(column=0, row=1, columnspan=2)
         self.text_field.bind('<Return>', self.respond_to_text_entry)
 
-        self.user_list_string = tk.StringVar()
-        self.user_list_string.set("user list")
-        self.user_list_label = ttk.Label(self.root, textvariable=self.user_list_string)
-        self.user_list_label.grid(column=0, row=0)
+        self.user_list_text = ScrolledText(self.root, background="black", foreground="white")
+        self.user_list_text.grid(column=0, row=0, sticky='ns')
+        self.user_list_text['state'] = 'disabled'
+
+
+        # self.user_list_string = tk.StringVar()
+        # self.user_list_string.set("user list")
+        # self.user_list_label = ttk.Label(self.root, textvariable=self.user_list_string)
+        # self.user_list_label.grid(column=0, row=0)
 
         self.chat_so_far = ""
         self.chat_response_text = ScrolledText(self.root, background='#bbbbbb')
@@ -45,7 +50,10 @@ class ClientGUI:
         names = ""
         for user in users:
             names += f"{user}\n"
-        self.user_list_string.set(names)
+
+        self.user_list_text['state'] = 'normal'
+        self.user_list_text.replace(1.0,'end',names)
+        self.user_list_text['state'] = 'disabled'
 
     def add_to_chat(self, entry: str)->None:
         self.chat_so_far += entry+"\n"
