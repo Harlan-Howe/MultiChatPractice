@@ -42,7 +42,6 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
     name = None
     manager = SocketMessageIO()
     while True:
-        # print(f"Waiting for message from {name}")
         try:
             type, message = manager.receive_message_from_socket(connection)
         except (ConnectionAbortedError, ConnectionResetError) :
@@ -50,7 +49,7 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
             userDictLock.acquire()
             del userDict[id]
             userDictLock.release()
-            broadcast_message_to_all(f"{name} has left the conversation.")
+            broadcast_message_to_all(f"{'-'*6} {name} has left the conversation. {'-'*6} ")
             send_user_list_to_all()
             return
 
@@ -60,7 +59,7 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
             userDictLock.acquire()
             userDict[id]["name"] = name
             userDictLock.release()
-            broadcast_message_to_all(f"{name} has joined the conversation.")
+            broadcast_message_to_all(f"{'-'*6} {name} has joined the conversation. {'-'*6} ")
             send_user_list_to_all()
         else:
             broadcast_message_to_all(f"{name}: {message}")
@@ -84,7 +83,6 @@ if __name__ == '__main__':
         connection, address = mySocket.accept()
 
         print (f"Got connection from {address}")
-        # connection.send("Thank you for connecting.".encode())
 
         latest_id += 1
         connectionThread = threading.Thread(target=listen_to_connection, args=(connection, latest_id, address))
@@ -92,8 +90,6 @@ if __name__ == '__main__':
         userDictLock.acquire()
         userDict[latest_id] = {"name":"unknown", "connection":connection}
         userDictLock.release()
-
-
         connectionThread.start()
 
 
