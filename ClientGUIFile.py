@@ -30,21 +30,10 @@ class ClientGUI:
         self.user_list_text.grid(column=0, row=0, sticky='ns')
         self.user_list_text['state'] = 'disabled'
 
-
-        # self.user_list_string = tk.StringVar()
-        # self.user_list_string.set("user list")
-        # self.user_list_label = ttk.Label(self.root, textvariable=self.user_list_string)
-        # self.user_list_label.grid(column=0, row=0)
-
         self.chat_so_far = ""
         self.chat_response_text = ScrolledText(self.root, background='#bbbbbb')
         self.chat_response_text.grid(column=1, row=0, sticky='ns')
         self.chat_response_text['state'] = 'disabled'
-
-        # self.chat_response_string = tk.StringVar()
-        # self.chat_response_string.set("Here is the chat so far.")
-        # self.chat_response_label = ttk.Label(self.root, textvariable=self.chat_response_string)
-        # self.chat_response_label.grid(column=1, row=0)
 
     def run_loop(self):
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -68,9 +57,7 @@ class ClientGUI:
         self.chat_response_text['state'] ='normal'
         self.chat_response_text.replace(1.0,'end',self.chat_so_far)
         self.chat_response_text['state'] ='disabled'
-        # chat_so_far = self.chat_response_string.get()
-        # chat_so_far += f"{entry}\n"
-        # self.chat_response_string.set(chat_so_far)
+
 
     def respond_to_text_entry(self, event_info):
         message = self.user_entry_string.get()
