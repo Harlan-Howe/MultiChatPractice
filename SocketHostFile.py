@@ -45,7 +45,7 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
         # print(f"Waiting for message from {name}")
         try:
             type, message = manager.receive_message_from_socket(connection)
-        except ConnectionAbortedError:
+        except (ConnectionAbortedError, ConnectionResetError) :
             print(f"{name} disconnected.")
             userDictLock.acquire()
             del userDict[id]
