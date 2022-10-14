@@ -28,7 +28,8 @@ def listen_for_messages(connection: socket):
 
     print("listen_for_messages is over.")
 
-def update_user_list(message: str)->None:
+
+def update_user_list(message: str) -> None:
     global user_list
     print(f"{message=}")
 
@@ -36,12 +37,14 @@ def update_user_list(message: str)->None:
     print(f"{parts=}")
     user_list.clear()
     num_users = int(parts[0])
-    for i in range(1,num_users+1):
+    for i in range(1, num_users+1):
         user_list.append(parts[i])
     client_gui.set_user_list(parts[1:0])
 
-def send_message(message:str):
+
+def send_message(message: str) -> None:
     manager.send_message_to_socket(message, mySocket)
+
 
 def close_socket():
     global keep_listening
@@ -50,8 +53,6 @@ def close_socket():
 
 
 if __name__ == '__main__':
-
-
     global manager, user_list, client_gui, mySocket, listener_thread, keep_listening
     client_gui = ClientGUI()
     user_list = []
@@ -61,20 +62,13 @@ if __name__ == '__main__':
 
     port = 3000
     mySocket.connect(('127.0.0.1', port))
-    # print (mySocket.recv(1024).decode())
-    # print (f"Sending {len(name)=}")
     manager.send_message_to_socket(name, mySocket)
-    # acknowledgement = manager.receive_message_from_socket(mySocket)
-    # print(acknowledgement)
     keep_listening = True
     listener_thread = threading.Thread(target=listen_for_messages, args=(mySocket,))
     listener_thread.start()
 
-    #telling the GUI about two methods in this class that it can call.
+    # telling the GUI about two methods in this class that it can call.
     client_gui.message_sender = send_message
     client_gui.shut_down_socket = close_socket
 
-
     client_gui.run_loop()
-
-
