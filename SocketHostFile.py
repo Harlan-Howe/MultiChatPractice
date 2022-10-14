@@ -4,31 +4,28 @@ from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
 def broadcast_message_to_all(message:str, message_type=MessageType.MESSAGE):
-    global userDictLock, userDict, broadcast_manager
+    global user_dictionary_lock, user_dictionary, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
 
-    userDictLock.acquire()
-    for id in userDict:
-        broadcast_manager.send_message_to_socket(message, userDict[id]["connection"], type=message_type)
-    userDictLock.release()
+    user_dictionary_lock.acquire()
+    for id in user_dictionary:
+        broadcast_manager.send_message_to_socket(message, user_dictionary[id]["connection"], type=message_type)
+    user_dictionary_lock.release()
 
 def send_user_list_to_all():
-    global userDictLock, userDict, broadcast_manager
+    global user_dictionary_lock, user_dictionary, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
 
     #develop list of online users
-    userDictLock.acquire()
-    list_info = f"{len(userDict)}"
-    for id in userDict:
-        print(f"{id=}\t{userDict[id]}\t{userDict[id]['name']=}")
-        list_info += f"\t{userDict[id]['name']}"
-
-    #send that message to every user.
-    # for id in userDict:
-    #     broadcast_manager.send_message_to_socket(message=list_info, connection=userDict[id]["connection"],type=MessageType.USER_LIST)
-    userDictLock.release()
+    user_dictionary_lock.acquire()
+    list_info = f"{len(user_dictionary)}"
+    for id in user_dictionary:
+        print(f"{id=}\t{user_dictionary[id]}\t{user_dictionary[id]['name']=}")
+        list_info += f"\t{user_dictionary[id]['name']}"
+    user_dictionary_lock.release()
+    # send that message to every user.
     broadcast_message_to_all(list_info, message_type=MessageType.USER_LIST)
 
 def listen_to_connection(connection:socket, id: int, address:str = None)->None:
@@ -47,9 +44,9 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
             type, message = manager.receive_message_from_socket(connection)
         except (ConnectionAbortedError, ConnectionResetError) :
             print(f"{name} just disconnected.")
-            userDictLock.acquire()
-            del userDict[id]
-            userDictLock.release()
+            user_dictionary_lock.acquire()
+            del user_dictionary[id]
+            user_dictionary_lock.release()
             broadcast_message_to_all(f"{'-'*6} {name} has left the conversation. {'-'*6} ")
             send_user_list_to_all()
             return
@@ -57,9 +54,9 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
         if name is None:
             name = message
             manager.send_message_to_socket(f"Welcome, {name}!", connection)
-            userDictLock.acquire()
-            userDict[id]["name"] = name
-            userDictLock.release()
+            user_dictionary_lock.acquire()
+            user_dictionary[id]["name"] = name
+            user_dictionary_lock.release()
             broadcast_message_to_all(f"{'-'*6} {name} has joined the conversation. {'-'*6} ")
             send_user_list_to_all()
         else:
@@ -68,12 +65,12 @@ def listen_to_connection(connection:socket, id: int, address:str = None)->None:
 
 
 if __name__ == '__main__':
-    global userDict, userDictLock, latest_id, broadcast_manager
+    global user_dictionary, user_dictionary_lock, latest_id, broadcast_manager
     broadcast_manager = None
     latest_id = 0
 
-    userDict: Dict[int, Dict] = {}
-    userDictLock = threading.Lock()
+    user_dictionary: Dict[int, Dict] = {}
+    user_dictionary_lock = threading.Lock()
 
     mySocket = socket.socket()
     port = 3000
@@ -88,9 +85,9 @@ if __name__ == '__main__':
         latest_id += 1
         connectionThread = threading.Thread(target=listen_to_connection, args=(connection, latest_id, address))
 
-        userDictLock.acquire()
-        userDict[latest_id] = {"name":"unknown", "connection":connection}
-        userDictLock.release()
+        user_dictionary_lock.acquire()
+        user_dictionary[latest_id] = {"name": "unknown", "connection":connection}
+        user_dictionary_lock.release()
         connectionThread.start()
 
 
