@@ -12,7 +12,7 @@ def broadcast_message_to_all(message: str, message_type=MessageType.MESSAGE):
 
     user_dictionary_lock.acquire()
     for user_id in user_dictionary:
-        broadcast_manager.send_message_to_socket(message, user_dictionary[user_id]["connection"], type=message_type)
+        broadcast_manager.send_message_to_socket(message, user_dictionary[user_id]["connection"], message_type=message_type)
     user_dictionary_lock.release()
 
 
