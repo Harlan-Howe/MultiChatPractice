@@ -3,14 +3,14 @@ from typing import Dict, List
 from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
-def broadcast_message_to_all(message:str):
+def broadcast_message_to_all(message:str, message_type=MessageType.MESSAGE):
     global userDictLock, userDict, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
 
     userDictLock.acquire()
     for id in userDict:
-        broadcast_manager.send_message_to_socket(message, userDict[id]["connection"])
+        broadcast_manager.send_message_to_socket(message, userDict[id]["connection"], type=message_type)
     userDictLock.release()
 
 def send_user_list_to_all():
@@ -18,17 +18,18 @@ def send_user_list_to_all():
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
 
+    #develop list of online users
     userDictLock.acquire()
     list_info = f"{len(userDict)}"
     for id in userDict:
         print(f"{id=}\t{userDict[id]}\t{userDict[id]['name']=}")
         list_info += f"\t{userDict[id]['name']}"
 
-    print(f"{list_info=}")
-
-    for id in userDict:
-        broadcast_manager.send_message_to_socket(message=list_info, connection=userDict[id]["connection"],type=MessageType.USER_LIST)
+    #send that message to every user.
+    # for id in userDict:
+    #     broadcast_manager.send_message_to_socket(message=list_info, connection=userDict[id]["connection"],type=MessageType.USER_LIST)
     userDictLock.release()
+    broadcast_message_to_all(list_info, message_type=MessageType.USER_LIST)
 
 def listen_to_connection(connection:socket, id: int, address:str = None)->None:
     """
