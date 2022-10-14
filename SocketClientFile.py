@@ -1,24 +1,24 @@
-import socket, struct, threading
-from SocketMessageIOFile import SocketMessageIO, MessageType
+import socket
+import threading
+
 from ClientGUIFile import ClientGUI
-import tkinter as tk
-from tkinter import ttk
-
-
+from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
 def listen_for_messages(connection: socket):
-
+    global keep_listening
     while keep_listening:
         try:
-            type, message = manager.receive_message_from_socket(connection)
-        except:
-            continue
-        print(f"{type=}\t{message=}")
-        if type == MessageType.MESSAGE:
+            message_type, message = manager.receive_message_from_socket(connection)
+        except ConnectionAbortedError as CAErr:
+            print(CAErr)
+            keep_listening = False
+            break
+        print(f"{message_type=}\t{message=}")
+        if message_type == MessageType.MESSAGE:
             print(f"MSG: {message}")
             client_gui.add_to_chat(message)
-        elif type == MessageType.USER_LIST:
+        elif message_type == MessageType.USER_LIST:
             update_user_list(message)
             print("------------------")
             for i in range(len(user_list)):
