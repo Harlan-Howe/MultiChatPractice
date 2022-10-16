@@ -8,12 +8,15 @@ class ClientGUI:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Client")
-        self.root.geometry('800x800+50+50')
+        self.root.geometry('800x800+50+50')  # an 800 x 800 window, offset on screen by (50, 50).
+
+        # set the relative sizes of the columns and rows in this grid
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=3)
         self.root.rowconfigure(0, weight=6)
         self.root.rowconfigure(1, weight=1)
 
+        # the bottom frame is where the user is prompted to type something, along with the text field to type it.
         bottom_frame = ttk.Frame(self.root)
         bottom_frame.columnconfigure(0, weight=1)
         bottom_frame.columnconfigure(1, weight=6)
@@ -27,17 +30,21 @@ class ClientGUI:
         self.text_field.grid(column=1, row=0, sticky='ew')
         self.text_field.bind('<Return>', self.respond_to_text_entry)
 
+        # This is where the user list is kept.
         self.user_list_text = ScrolledText(self.root, width=20, background="black", foreground="white")
         self.user_list_text.grid(column=0, row=0, sticky='ns')
-        self.user_list_text['state'] = 'disabled'
+        self.user_list_text['state'] = 'disabled'  # not editable by user
 
+        # this is where the transcript of the chat is kept.
         self.chat_so_far = ""
         self.chat_response_text = ScrolledText(self.root, background='#bbbbbb')
         self.chat_response_text.grid(column=1, row=0, sticky='ns')
-        self.chat_response_text['state'] = 'disabled'
+        self.chat_response_text['state'] = 'disabled'  # not editable by user
 
+        # these are two additional methods (yes, really!) that will be set by an external class so that we can call them
+        # from inside this class once they have been set. But for now, they're None.
         self.shut_down_socket = None
-        self.message_sender = None
+        self.tell_my_client_to_send_message = None
 
     def run_loop(self):
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -64,5 +71,5 @@ class ClientGUI:
 
     def respond_to_text_entry(self, event_info):
         message = self.user_entry_string.get()
-        self.message_sender(message)
+        self.tell_my_client_to_send_message(message)
         self.user_entry_string.set("")
