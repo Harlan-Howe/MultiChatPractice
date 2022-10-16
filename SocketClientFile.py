@@ -5,13 +5,18 @@ from ClientGUIFile import ClientGUI
 from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
-def listen_for_messages(connection: socket):
+def listen_for_messages(connection: socket) -> None:
+    """
+    the loop that waits to receive information from the host socket and routes messages to the appropriate handler
+    :param connection: the socket to which to listen
+    :return: None
+    """
     global keep_listening
     while keep_listening:
         try:
             message_type, message = manager.receive_message_from_socket(connection)
-        except ConnectionAbortedError as CAErr:
-            print(CAErr)
+        except ConnectionAbortedError as CAErr: # if the socket is dropped, bail out.
+            # print(CAErr)
             keep_listening = False
             break
         print(f"{message_type=}\t{message=}")
@@ -24,6 +29,12 @@ def listen_for_messages(connection: socket):
 
 
 def handle_user_list_update(tab_delimited_user_list_string:str) -> None:
+    """
+    The host has sent a tab-delimited string describing an updated user list; update the user_list in memory and
+    onscreen.
+    :param tab_delimited_user_list_string: new information about the list of users from the host socket
+    :return: None
+    """
     update_user_list(tab_delimited_user_list_string)
     print("------------------")
     for i in range(len(user_list)):
@@ -33,15 +44,26 @@ def handle_user_list_update(tab_delimited_user_list_string:str) -> None:
 
 
 def handle_receive_submission(submission:str) -> None:
+    """
+    The host has sent a string from one of the users (or the host, itself) that should be posted; do so!
+    :param submission: the string to post
+    :return: None
+    """
     print(f"MSG: {submission}")
     client_gui.add_to_chat(submission)
 
 
-def update_user_list(message: str) -> None:
+def update_user_list(tab_delimited_user_list_string: str) -> None:
+    """
+    parse the tab-delimited string that contains the current list of users, replacing the information currently held
+    in user_list.
+    :param tab_delimited_user_list_string: a tab-delimited string that holds a number of users and then the list of usernames
+    :return: None
+    """
     global user_list
-    print(f"{message=}")
+    print(f"{tab_delimited_user_list_string=}")
 
-    parts = message.split("\t")
+    parts = tab_delimited_user_list_string.split("\t")
     print(f"{parts=}")
     user_list.clear()
     num_users = int(parts[0])
@@ -51,10 +73,19 @@ def update_user_list(message: str) -> None:
 
 
 def send_message(message: str) -> None:
+    """
+    forwards the given string on to the socketMessageIO manager to send to the host in the appropriate format
+    :param message: the string to send
+    :return: None
+    """
     manager.send_message_to_socket(message, mySocket)
 
 
-def close_socket():
+def close_socket()  -> None:
+    """
+    cease listening for the socket and shut down the socket.
+    :return: None
+    """
     global keep_listening
     keep_listening = False
     mySocket.close()
