@@ -18,8 +18,8 @@ def listen_for_messages(connection: socket) -> None:
     while keep_listening:
         try:
             message_type, message = manager.receive_message_from_socket(connection)
-        except ConnectionAbortedError as CAErr: # if the socket is dropped, bail out.
-            # print(CAErr)
+        except (ConnectionAbortedError, OSError) as Err: # if the socket is dropped, bail out.
+            # print(Err)
             keep_listening = False
             break
         print(f"{message_type=}\t{message=}")
