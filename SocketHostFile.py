@@ -5,7 +5,14 @@ from typing import Dict
 from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
-def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION):
+def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION) -> None:
+    """
+    sends the following message to all the users for whom I have sockets.
+    :param message: the message to send
+    :param message_type: the type of message being sentm, defaults to a "SUBMISSION" - this precedes the message,
+    itself.
+    :return: None
+    """
     global user_dictionary_lock, user_dictionary, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
@@ -16,7 +23,13 @@ def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION):
     user_dictionary_lock.release()
 
 
-def send_user_list_to_all():
+def send_user_list_to_all() -> None:
+    """
+    compiles a list of all the users, and the number of users. Builds this as a tab delimited string in format:
+         num_users-->user0Name-->user1Name-->user2Name...
+    and sends this to all current sockets.
+    :return: None
+    """
     global user_dictionary_lock, user_dictionary, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()
