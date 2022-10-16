@@ -10,6 +10,20 @@ class ClientGUI:
         self.root.title("Client")
         self.root.geometry('800x800+50+50')  # an 800 x 800 window, offset on screen by (50, 50).
 
+        self.user_entry_string = None
+        self.text_field = None
+        self.user_list_text = None
+        self.chat_so_far = ""
+        self.chat_response_text = None
+
+        self.build_GUI_elements()
+
+        # these are two additional methods (yes, really!) that will be set by an external class so that we can call them
+        # from inside this class once they have been set. But for now, they're None.
+        self.shut_down_socket = None
+        self.tell_my_client_to_send_message = None
+
+    def build_GUI_elements(self):
         # set the relative sizes of the columns and rows in this grid
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=3)
@@ -21,10 +35,8 @@ class ClientGUI:
         bottom_frame.columnconfigure(0, weight=1)
         bottom_frame.columnconfigure(1, weight=6)
         bottom_frame.grid(column=0, row=1, columnspan=2, sticky='new')
-
         entry_label = ttk.Label(bottom_frame, text='Enter what you want to say here:')
-        entry_label.grid(column=0, row=0,  sticky='e')
-
+        entry_label.grid(column=0, row=0, sticky='e')
         self.user_entry_string = tk.StringVar()
         self.text_field = ttk.Entry(bottom_frame, textvariable=self.user_entry_string)
         self.text_field.grid(column=1, row=0, sticky='ew')
@@ -36,15 +48,9 @@ class ClientGUI:
         self.user_list_text['state'] = 'disabled'  # not editable by user
 
         # this is where the transcript of the chat is kept.
-        self.chat_so_far = ""
         self.chat_response_text = ScrolledText(self.root, background='#bbbbbb')
         self.chat_response_text.grid(column=1, row=0, sticky='ns')
         self.chat_response_text['state'] = 'disabled'  # not editable by user
-
-        # these are two additional methods (yes, really!) that will be set by an external class so that we can call them
-        # from inside this class once they have been set. But for now, they're None.
-        self.shut_down_socket = None
-        self.tell_my_client_to_send_message = None
 
     def run_loop(self):
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
