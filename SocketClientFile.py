@@ -4,6 +4,9 @@ import threading
 from ClientGUIFile import ClientGUI
 from SocketMessageIOFile import SocketMessageIO, MessageType
 
+host_URL = '127.0.0.1'
+port = 3000
+
 
 def listen_for_messages(connection: socket) -> None:
     """
@@ -99,8 +102,7 @@ if __name__ == '__main__':
     manager = SocketMessageIO()
     name = input("What is your name? ")
 
-    port = 3000
-    mySocket.connect(('127.0.0.1', port))
+    mySocket.connect((host_URL, port))
     manager.send_message_to_socket(name, mySocket)
     keep_listening = True
     listener_thread = threading.Thread(target=listen_for_messages, args=(mySocket,))
