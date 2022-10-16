@@ -3,7 +3,7 @@ import threading
 from typing import Dict
 
 from SocketMessageIOFile import SocketMessageIO, MessageType
-
+port = 3000
 
 def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION) -> None:
     """
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     user_dictionary_lock = threading.Lock()
 
     mySocket = socket.socket()
-    port = 3000
+
     mySocket.bind(('', port))
     mySocket.listen(5)
     print("Socket is listening.")
