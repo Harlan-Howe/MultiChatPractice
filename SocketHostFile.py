@@ -5,7 +5,7 @@ from typing import Dict
 from SocketMessageIOFile import SocketMessageIO, MessageType
 
 
-def broadcast_message_to_all(message: str, message_type=MessageType.MESSAGE):
+def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION):
     global user_dictionary_lock, user_dictionary, broadcast_manager
     if broadcast_manager is None:
         broadcast_manager = SocketMessageIO()

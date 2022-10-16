@@ -15,8 +15,8 @@ def listen_for_messages(connection: socket):
             keep_listening = False
             break
         print(f"{message_type=}\t{message=}")
-        if message_type == MessageType.MESSAGE:
-            handle_receive_message(message)
+        if message_type == MessageType.SUBMISSION:
+            handle_receive_submission(message)
         elif message_type == MessageType.USER_LIST:
             handle_user_list_update(message)
 
@@ -32,9 +32,9 @@ def handle_user_list_update(tab_delimited_user_list_string:str) -> None:
     client_gui.set_user_list(user_list)
 
 
-def handle_receive_message(message:str) -> None:
-    print(f"MSG: {message}")
-    client_gui.add_to_chat(message)
+def handle_receive_submission(submission:str) -> None:
+    print(f"MSG: {submission}")
+    client_gui.add_to_chat(submission)
 
 
 def update_user_list(message: str) -> None:

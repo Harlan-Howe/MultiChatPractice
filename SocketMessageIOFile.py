@@ -5,7 +5,7 @@ from typing import Tuple
 
 
 class MessageType(Enum):
-    MESSAGE = 1
+    SUBMISSION = 1
     USER_LIST = 2
 
 
@@ -49,7 +49,7 @@ class SocketMessageIO:
         output_message = message[first_tab_loc+1:]  # the rest of the string from after the initial tab.
         return message_type, output_message
 
-    def send_message_to_socket(self, message: str, connection: socket, message_type = MessageType.MESSAGE) -> None:
+    def send_message_to_socket(self, message: str, connection: socket, message_type = MessageType.SUBMISSION) -> None:
         """
         Sends the given message to the given socket in the format of the packed length of the message, followed by
         the encoded message, itself.
