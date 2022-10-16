@@ -23,7 +23,11 @@ class ClientGUI:
         self.shut_down_socket = None
         self.tell_my_client_to_send_message = None
 
-    def build_GUI_elements(self):
+    def build_GUI_elements(self) -> None:
+        """
+        builds and arranges the GUI items for the window.
+        :return: None
+        """
         # set the relative sizes of the columns and rows in this grid
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=3)
@@ -52,15 +56,28 @@ class ClientGUI:
         self.chat_response_text.grid(column=1, row=0, sticky='ns')
         self.chat_response_text['state'] = 'disabled'  # not editable by user
 
-    def run_loop(self):
+    def run_loop(self) -> None:
+        """
+        identifies the method that should be called when the user closes the window, and starts the Tk GUI main loop.
+        :return: None
+        """
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
 
-    def on_closing(self):
+    def on_closing(self) -> None:
+        """
+        when it is time to close the window, shut down the socket to the host (gracefully) and then close the window.
+        :return: None
+        """
         self.shut_down_socket()
         self.root.destroy()
 
     def set_user_list(self, users: List[str]) -> None:
+        """
+        updates the onscreen list of users with the given list of strings.
+        :param users: a list of usernames
+        :return: None
+        """
         names = ""
         for user in users:
             names += f"{user}\n"
@@ -70,12 +87,25 @@ class ClientGUI:
         self.user_list_text['state'] = 'disabled'
 
     def add_to_chat(self, entry: str) -> None:
+        """
+        appends the given entry to the list of items in the chat_so_far and updates the chat_response_text GUI text
+        area, accordingly.
+        :param entry: the string to append to the chat_so_far.
+        :return: None
+        """
         self.chat_so_far += entry+"\n"
         self.chat_response_text['state'] = 'normal'
         self.chat_response_text.replace(1.0, 'end', self.chat_so_far)
         self.chat_response_text['state'] = 'disabled'
 
     def respond_to_text_entry(self, event_info):
+        """
+        the user has pressed return when the cursor is in the textfield, so send the submission contained there (if any)
+        and clear the textfield for the next time.
+        :param event_info: not used, but required for callback.
+        :return: None
+        """
         message = self.user_entry_string.get()
-        self.tell_my_client_to_send_message(message)
-        self.user_entry_string.set("")
+        if message != "":
+            self.tell_my_client_to_send_message(message)
+            self.user_entry_string.set("")
