@@ -16,17 +16,25 @@ def listen_for_messages(connection: socket):
             break
         print(f"{message_type=}\t{message=}")
         if message_type == MessageType.MESSAGE:
-            print(f"MSG: {message}")
-            client_gui.add_to_chat(message)
+            handle_receive_message(message)
         elif message_type == MessageType.USER_LIST:
-            update_user_list(message)
-            print("------------------")
-            for i in range(len(user_list)):
-                print(f"{i}\t{user_list[i]}")
-            print("------------------")
-            client_gui.set_user_list(user_list)
+            handle_user_list_update(message)
 
     print("listen_for_messages is over.")
+
+
+def handle_user_list_update(tab_delimited_user_list_string:str) -> None:
+    update_user_list(tab_delimited_user_list_string)
+    print("------------------")
+    for i in range(len(user_list)):
+        print(f"{i}\t{user_list[i]}")
+    print("------------------")
+    client_gui.set_user_list(user_list)
+
+
+def handle_receive_message(message:str) -> None:
+    print(f"MSG: {message}")
+    client_gui.add_to_chat(message)
 
 
 def update_user_list(message: str) -> None:
@@ -68,7 +76,7 @@ if __name__ == '__main__':
     listener_thread.start()
 
     # telling the GUI about two methods in this class that it can call.
-    client_gui.message_sender = send_message
+    client_gui.tell_my_client_to_send_message = send_message
     client_gui.shut_down_socket = close_socket
 
     client_gui.run_loop()
