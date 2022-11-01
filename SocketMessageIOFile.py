@@ -4,17 +4,15 @@ from enum import Enum
 from typing import Tuple
 
 
-class MessageType(Enum):
-    SUBMISSION = 1
-    USER_LIST = 2
-
+MESSAGE_TYPE_SUBMISSION = "SUBMISSION"
+MESSAGE_TYPE_USER_LIST = "USER_LIST"
 
 class SocketMessageIO:
     """
     A utility class that makes it easy to send and receive messages from a socket in the format of a packed length of
     the message, followed by the message.
     """
-    def receive_message_from_socket(self, connection: socket) -> Tuple[MessageType, str]:
+    def receive_message_from_socket(self, connection: socket) -> Tuple[str, str]:
         """
         Waits until the socket provides a message in the form of a packed length of the message and the message itself.
         The message could conceivably be quite long, so it will do multiple reads of the socket until all the data
@@ -44,12 +42,14 @@ class SocketMessageIO:
 
         first_tab_loc = message.find("\t")
 
-        message_type = MessageType[message[12:first_tab_loc]]  # Note: the 12 clears the "MessageType." from the front
-        #                                                              of the string....
+        message_type = message[0:first_tab_loc]
         output_message = message[first_tab_loc+1:]  # the rest of the string from after the initial tab.
         return message_type, output_message
 
-    def send_message_to_socket(self, message: str, connection: socket, message_type = MessageType.SUBMISSION) -> None:
+    def send_message_to_socket(self,
+                               message: str,
+                               connection: socket,
+                               message_type: str = MESSAGE_TYPE_SUBMISSION) -> None:
         """
         Sends the given message to the given socket in the format of the packed length of the message, followed by
         the encoded message, itself.
