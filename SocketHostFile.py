@@ -2,10 +2,11 @@ import socket
 import threading
 from typing import Dict
 
-from SocketMessageIOFile import SocketMessageIO, MessageType
+from SocketMessageIOFile import SocketMessageIO, MESSAGE_TYPE_SUBMISSION, MESSAGE_TYPE_USER_LIST
 port = 3000
 
-def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION) -> None:
+
+def broadcast_message_to_all(message: str, message_type: str = MESSAGE_TYPE_SUBMISSION) -> None:
     """
     sends the following message to all the users for whom I have sockets.
     :param message: the message to send
@@ -19,7 +20,8 @@ def broadcast_message_to_all(message: str, message_type=MessageType.SUBMISSION) 
 
     user_dictionary_lock.acquire()
     for user_id in user_dictionary:
-        broadcast_manager.send_message_to_socket(message, user_dictionary[user_id]["connection"], message_type=message_type)
+        broadcast_manager.send_message_to_socket(message, user_dictionary[user_id]["connection"],
+                                                 message_type=message_type)
     user_dictionary_lock.release()
 
 
@@ -42,17 +44,16 @@ def send_user_list_to_all() -> None:
         list_info += f"\t{user_dictionary[user_id]['name']}"
     user_dictionary_lock.release()
     # send that message to every user.
-    broadcast_message_to_all(list_info, message_type=MessageType.USER_LIST)
+    broadcast_message_to_all(list_info, message_type=MESSAGE_TYPE_USER_LIST)
 
 
-def listen_to_connection(connection_to_hear: socket, connection_id: int, connection_address: str = None) -> None:
+def listen_to_connection(connection_to_hear: socket, connection_id: int) -> None:
     """
     a loop intended for a Thread to monitor the given socket and handle any messages that come from it. In this case,
     it is assumed that the first message received will be the name of the connection, in the format of a packed length
     of the name and then the name itself. All messages should be in the format of packed length + message.
     :param connection_to_hear: the socket that will be read from
     :param connection_id: the unique id number of this user.
-    :param connection_address: the address of the socket (not currently used)
     :return: None
     """
     name = None
@@ -70,7 +71,7 @@ def listen_to_connection(connection_to_hear: socket, connection_id: int, connect
             return
 
         # if we got here, that means that we've received a message.
-        if message_type == MessageType.SUBMISSION:
+        if message_type == MESSAGE_TYPE_SUBMISSION:
             if name is None:  # this must be the first message, which is just the username.
                 name = message
                 manager.send_message_to_socket(f"Welcome, {name}!", connection_to_hear)
@@ -108,7 +109,7 @@ if __name__ == '__main__':
 
         # start a new thread that will continuously listen for communication from this socket connection.
         latest_id += 1
-        connectionThread = threading.Thread(target=listen_to_connection, args=(connection, latest_id, address))
+        connectionThread = threading.Thread(target=listen_to_connection, args=(connection, latest_id))
 
         user_dictionary_lock.acquire()
         user_dictionary[latest_id] = {"name": "unknown", "connection": connection}
