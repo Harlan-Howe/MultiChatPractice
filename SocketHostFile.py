@@ -96,13 +96,13 @@ if __name__ == '__main__':
     user_dictionary: Dict[int, Dict] = {}
     user_dictionary_lock = threading.Lock()
 
-    mySocket = socket.socket()
+    my_socket = socket.socket()
 
-    mySocket.bind(('', port))
-    mySocket.listen(5)
+    my_socket.bind(('', port))
+    my_socket.listen(5)
     print("Socket is listening.")
     while True:
-        connection, address = mySocket.accept()  # wait to receive a new socket connection.
+        connection, address = my_socket.accept()  # wait to receive a new socket connection.
 
         print(f"Got connection from {address}")
 

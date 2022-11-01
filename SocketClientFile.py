@@ -81,7 +81,7 @@ def send_message(message: str) -> None:
     :param message: the string to send
     :return: None
     """
-    manager.send_message_to_socket(message, mySocket)
+    manager.send_message_to_socket(message, my_socket)
 
 
 def close_socket()  -> None:
@@ -91,21 +91,21 @@ def close_socket()  -> None:
     """
     global keep_listening
     keep_listening = False
-    mySocket.close()
+    my_socket.close()
 
 
 if __name__ == '__main__':
-    global manager, user_list, client_gui, mySocket, listener_thread, keep_listening
+    global manager, user_list, client_gui, my_socket, listener_thread, keep_listening
     client_gui = ClientGUI()
     user_list = []
-    mySocket = socket.socket()
+    my_socket = socket.socket()
     manager = SocketMessageIO()
     name = input("What is your name? ")
 
-    mySocket.connect((host_URL, port))
-    manager.send_message_to_socket(name, mySocket)
+    my_socket.connect((host_URL, port))
+    manager.send_message_to_socket(name, my_socket)
     keep_listening = True
-    listener_thread = threading.Thread(target=listen_for_messages, args=(mySocket,))
+    listener_thread = threading.Thread(target=listen_for_messages, args=(my_socket,))
     listener_thread.start()
 
     # telling the GUI about two methods in this class that it can call.
