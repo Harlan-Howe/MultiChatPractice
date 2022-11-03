@@ -79,6 +79,7 @@ def update_user_list(tab_delimited_user_list_string: str) -> None:
 def send_message(message: str) -> None:
     """
     forwards the given string on to the socketMessageIO manager to send to the host in the appropriate format
+    This is a callback method - the GUI class might call this in response to a user event.
     :param message: the string to send
     :return: None
     """
@@ -88,6 +89,7 @@ def send_message(message: str) -> None:
 def close_socket() -> None:
     """
     cease listening for the socket and shut down the socket.
+    This is a callback method - the GUI class might call this in response to a user event.
     :return: None
     """
     global keep_listening
