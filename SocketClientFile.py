@@ -100,7 +100,8 @@ if __name__ == '__main__':
     user_list = []
     my_socket = socket.socket()
     manager = SocketMessageIO()
-    name = input("What is your name? ")
+
+    name = client_gui.request_name()
 
     my_socket.connect((host_URL, port))
     manager.send_message_to_socket(name, my_socket)
