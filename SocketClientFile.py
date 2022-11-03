@@ -4,7 +4,8 @@ import threading
 from ClientGUIFile import ClientGUI
 from SocketMessageIOFile import SocketMessageIO, MESSAGE_TYPE_SUBMISSION, MESSAGE_TYPE_USER_LIST
 
-host_URL = '127.0.0.1'
+host_URL = '127.0.0.1'  # 127.0.0.1 means "this computer." If you're going to connect to somebody else, put their URL
+                        # here.
 port = 3000
 
 
@@ -38,10 +39,10 @@ def handle_user_list_update(tab_delimited_user_list_string: str) -> None:
     :return: None
     """
     update_user_list(tab_delimited_user_list_string)
-    print("------------------")
-    for i in range(len(user_list)):
-        print(f"{i}\t{user_list[i]}")
-    print("------------------")
+    # print("------------------")
+    # for i in range(len(user_list)):
+    #     print(f"{i}\t{user_list[i]}")
+    # print("------------------")
     client_gui.set_user_list(user_list)
 
 
@@ -51,7 +52,7 @@ def handle_receive_submission(submission: str) -> None:
     :param submission: the string to post
     :return: None
     """
-    print(f"MSG: {submission}")
+    # print(f"MSG: {submission}")
     client_gui.add_to_chat(submission)
 
 
@@ -64,10 +65,10 @@ def update_user_list(tab_delimited_user_list_string: str) -> None:
     :return: None
     """
     global user_list
-    print(f"{tab_delimited_user_list_string=}")
+    # print(f"{tab_delimited_user_list_string=}")
 
     parts = tab_delimited_user_list_string.split("\t")
-    print(f"{parts=}")
+    # print(f"{parts=}")
     user_list.clear()
     num_users = int(parts[0])
     for i in range(1, num_users+1):
