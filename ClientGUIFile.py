@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import simpledialog
 from tkinter.scrolledtext import ScrolledText
 from typing import List
 
@@ -63,6 +64,14 @@ class ClientGUI:
         """
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.mainloop()
+
+    def request_name(self) -> str:
+        """
+        displays a dialog box to request the player's handle
+        :return: the name the user entered.
+        """
+        answer = simpledialog.askstring("Input", "What is your first name?", parent=self.root)
+        return answer
 
     def on_closing(self) -> None:
         """
